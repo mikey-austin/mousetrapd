@@ -23,13 +23,27 @@ sub check {
 
     $new = 1 if not exists $self->{_buckets}->{$label};
 
-    if(exists MT::Config->get('overrides')->{$label}
-       and MT::Config->get('overrides')->{$label}->{event_max} =~ /\d+/
-       and MT::Config->get('overrides')->{$label}->{event_period} =~ /\d+/)
-    {
-        $self->{_buckets}->{$label}->{max} = MT::Config->get('overrides')->{$label}->{event_max};
-        $self->{_buckets}->{$label}->{period} = MT::Config->get('overrides')->{$label}->{event_period};
-        $threshold = MT::Config->get('overrides')->{$label}->{threshold};
+    if(exists MT::Config->get('overrides')->{$label}) {
+        if(MT::Config->get('overrides')->{$label}->{event_max}) {
+            $self->{_buckets}->{$label}->{max} = MT::Config->get('overrides')->{$label}->{event_max};
+        }
+        else {
+            $self->{_buckets}->{$label}->{max} = MT::Config->get('event_max');
+        }
+
+        if(MT::Config->get('overrides')->{$label}->{event_period}) {
+            $self->{_buckets}->{$label}->{period} = MT::Config->get('overrides')->{$label}->{event_period};
+        }
+        else {
+            $self->{_buckets}->{$label}->{period} = MT::Config->get('event_period');
+        }
+
+        if(MT::Config->get('overrides')->{$label}->{threshold}) {
+            $threshold = MT::Config->get('overrides')->{$label}->{threshold};
+        }
+        else {
+            $threshold = MT::Config->get('threshold');
+        }
     }
     else {
         $self->{_buckets}->{$label}->{max} = MT::Config->get('event_max');

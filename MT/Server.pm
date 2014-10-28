@@ -75,7 +75,7 @@ sub start {
             if(defined(my $label = <$handle>)) {
                 chomp $label;
                 if(not $self->{_token_bucket}->check($label)) {
-                    print "$name:$label is OVER THRESHOLD\n";
+                    $self->execute_action($name, $label);
                 }
                 else {
                     MT::Logger->debug("$name:$label is OK");
@@ -85,6 +85,24 @@ sub start {
     }
 
     # Not reached.
+}
+
+sub execute_action {
+    my ($self, $name, $label) = @_;
+
+    my $action = MT::Config->get('sources')->{$name}->{action};
+    $action =~ s/%L/$label/;
+
+    if((my $pid = fork()) == 0) {
+        # In child.
+        exec $action or die "Could not execute $action";
+    }
+    elsif(not defined $pid) {
+        MT::Logger->err("Could not fork action for $name");
+    }
+
+    # In parent.
+    MT::Logger->info("Executed action for $name: $action");
 }
 
 sub daemonize {
