@@ -64,11 +64,10 @@ sub start {
 
     # Start monitoring file descriptors.
     for(;;) {
-        while(my @ready = $self->{_select}->can_read) {
-            foreach my $handle (@ready) {
-                my $label = <$handle>;
-                print "Watcher match: $label\n";
-            }
+        my @ready = $self->{_select}->can_read;
+        foreach my $handle (@ready) {
+            my $label = <$handle>;
+            chomp $label;
         }
     }
 

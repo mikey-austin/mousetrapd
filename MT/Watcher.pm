@@ -55,6 +55,7 @@ sub start {
     while(my $buf = readline($self->{_read})) {
         if((@matches = ($buf =~ /$pattern/)) and $matches[$index]) {
             print { $self->{_parent_handle} } $matches[$index] . "\n";
+            $self->{_parent_handle}->flush;
         }
     }
 
