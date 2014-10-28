@@ -15,7 +15,10 @@ sub err {
 
 sub debug {
     my ($class, $message) = @_;
-    return $class->write($message, 'debug');
+
+    if(MT::Config->get('debug')) {
+        return $class->write($message, 'debug');
+    }
 }
 
 sub info {

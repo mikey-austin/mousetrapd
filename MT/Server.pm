@@ -7,6 +7,7 @@ use warnings;
 use MT::Config;
 use MT::Logger;
 use MT::Watcher;
+use MT::TokenBucket;
 use IO::Select;
 use IO::Handle;
 use POSIX ();
@@ -21,9 +22,11 @@ use constant {
 sub new {
     my ($class, $options) = @_;
     my $self = {
-        _watchers     => {},
-        _watcher_pids => {},
-        _options      => {},
+        _watchers        => {},
+        _watcher_pids    => {},
+        _watcher_handles => {},
+        _options         => {},
+        _token_bucket    => undef
     };
 
     # Load the configuration.
@@ -37,6 +40,8 @@ sub new {
 
     # Set remaining options.
     $self->{_options}->{$_} = $options->{$_} for qw|daemonize user group config|;
+
+    $self->{_token_bucket} = MT::TokenBucket->new;
 
     bless $self, $class;
 }
@@ -66,8 +71,16 @@ sub start {
     for(;;) {
         my @ready = $self->{_select}->can_read;
         foreach my $handle (@ready) {
-            my $label = <$handle>;
-            chomp $label;
+            my $name = $self->{_watcher_handles}->{fileno($handle)};
+            if(defined(my $label = <$handle>)) {
+                chomp $label;
+                if(not $self->{_token_bucket}->check($label)) {
+                    print "$name:$label is OVER THRESHOLD\n";
+                }
+                else {
+                    MT::Logger->debug("$name:$label is OK");
+                }
+            }
         }
     }
 
@@ -159,6 +172,7 @@ sub start_watcher {
         close($write);
         $self->{_select}->add($read);
         $self->{_watcher_pids}->{$pid} = $name;
+        $self->{_watcher_handles}->{fileno($read)} = $name;
         $self->{_watchers}->{$name} = {
             _pid  => $pid,
             _read => $read
@@ -187,7 +201,8 @@ sub stop_watcher {
 
     MT::Logger->write("Stopping watcher $name");
     my $pid = $self->{_watchers}->{$name}->{_pid};
-    $self->{_select}->remove($self->{_watchers}->{$name}->{_read});
+    my $read = $self->{_watchers}->{$name}->{_read};
+    $self->{_select}->remove($read);
 
     kill($sig, $pid) if defined $pid;
 }
@@ -231,8 +246,10 @@ sub register_signals {
             $name = $self->{_watcher_pids}->{$child};
 
             if(defined $name) {
-                delete ${$self->{_watchers}}{$name};
-                delete ${$self->{_watcher_pids}}{$child};
+                my $read = $self->{_watchers}->{$name}->{_read};
+                delete $self->{_watcher_handles}->{fileno($read)};
+                delete $self->{_watchers}->{$name};
+                delete $self->{_watcher_pids}->{$child};
 
                 if($exit_status != 0) {
                     MT::Logger->err('Watcher process died, exiting...');
