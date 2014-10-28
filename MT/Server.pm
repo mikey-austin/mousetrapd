@@ -39,7 +39,7 @@ sub new {
     MT::Config->set('pidfile', $self->{_options}->{pidfile});
 
     # Set remaining options.
-    $self->{_options}->{$_} = $options->{$_} for qw|daemonize user group config|;
+    $self->{_options}->{$_} = $options->{$_} || MT::Config->get($_) for qw|daemonize user group config|;
 
     $self->{_token_bucket} = MT::TokenBucket->new;
 
@@ -49,8 +49,12 @@ sub new {
 sub start {
     my $self = shift;
 
-    die MT::Logger->err('PID file exists, exiting...')
-        if -e MT::Config->get('pidfile');
+    if(-e MT::Config->get('pidfile')) {
+        MT::Logger->err('PID file exists, exiting...');
+        $self->shutdown;
+        exit(1);
+    }
+
 
     if($self->{_options}->{daemonize}) {
         $self->daemonize;
@@ -64,7 +68,7 @@ sub start {
     $self->{_select} = IO::Select->new;
     $self->start_watchers;
 
-    # Set the various signal handlers after the sender has been forked.
+    # Set the various signal handlers after the watchers have been started.
     $self->register_signals;
 
     # Start monitoring file descriptors.
@@ -99,6 +103,8 @@ sub execute_action {
     }
     elsif(not defined $pid) {
         MT::Logger->err("Could not fork action for $name");
+        $self->shutdown;
+        exit(1);
     }
 
     # In parent.
@@ -114,23 +120,35 @@ sub daemonize {
     # Drop privileges.
     if(defined $self->{_options}->{user}) {
         my $uid = getpwnam($self->{_options}->{user});
-        POSIX::setuid($uid)
-            or die MT::Logger->err("Could not setuid to $uid, exiting...", 'err');
+        if(not POSIX::setuid($uid)) {
+            MT::Logger->err("Could not setuid to $uid, exiting...", 'err');
+            $self->shutdown;
+            exit(1);
+        }
     }
 
     if(defined $self->{_options}->{group}) {
         my $gid = getgrnam($self->{_options}->{group});
-        POSIX::setgid($gid)
-            or die MT::Logger->err("Could not setgid to $gid, exiting...", 'err');
+        if(not POSIX::setgid($gid)) {
+            MT::Logger->err("Could not setgid to $gid, exiting...", 'err');
+            $self->shutdown;
+            exit(1);
+        }
     }
 
     # Become session leader.
-    POSIX::setsid or die MT::Logger->err("Could not setsid: $!");
+    if(not POSIX::setsid) {
+        MT::Logger->err("Could not setsid: $!");
+        $self->shutdown;
+        exit(1);
+    }
 
     # Fork a child process.
     my $pid = fork();
     if($pid < 0) {
-        die MT::Logger->err("Could not fork: $!");
+        MT::Logger->err("Could not fork: $!");
+        $self->shutdown;
+        exit(1);
     }
     elsif($pid) {
         exit;
@@ -184,7 +202,9 @@ sub start_watcher {
         $watcher->start;
     }
     elsif($pid < 0) {
-        die MT::Logger->err('Could not fork watcher process, exiting...');
+        MT::Logger->err('Could not fork watcher process, exiting...');
+        $self->shutdown;
+        exit(1);
     }
     else {
         close($write);
@@ -241,7 +261,6 @@ sub register_signals {
         MT::Config->reload($self->{_options}->{config}, $self->DEFAULTS);
 
         # Override any options set via command line.
-        MT::Config->set('socket_path', $self->{_options}->{socket});
         MT::Config->set('pidfile', $self->{_options}->{pidfile});
 
         # The watchers will restart.
@@ -289,7 +308,6 @@ sub shutdown {
     MT::Logger->write("Shutting down mousetrap $$...");
     $self->stop_watchers;
 
-    # Clean up socket and pidfile.
     unlink(MT::Config->get('pidfile')) if -e MT::Config->get('pidfile');
 }
 

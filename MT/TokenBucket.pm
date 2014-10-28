@@ -79,6 +79,9 @@ sub check {
             $self->{_buckets}->{$label}->{threshold} = 0;
             return 0;
         }
+
+        MT::Logger->info("$label has been trapped, still within threshold of "
+                         . $self->{_buckets}->{$label}->{threshold});
     }
     else {
         # This label is still within the threshold.
