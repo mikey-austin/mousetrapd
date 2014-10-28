@@ -42,7 +42,7 @@ $server->start;
 __END__
 =head1 mousetrap
 
-mousetrap - Trapping daemon
+mousetrap - Log monitoring and active response daemon
 
 =head1 SYNOPSIS
 
@@ -56,5 +56,64 @@ mousetrap - Trapping daemon
     --config=<config>      path to configuration file
     --help                 print help and exit
     --version              print version and exit
+
+=head1 DESCRIPTION
+
+This program monitors multiple file sources as specified in the
+configuration file and executes arbitrary actions based on the
+frequency of observer "events".
+
+An event is a captured string extracted out of a line from a log file.
+For example, if the following source was configured in the mousetrap
+configuration file:
+
+  my_iptables_source: {
+    file:    '/var/log/kern.log',
+    pattern: 'audit out smtp .+ UID=(\d+)',
+    index:   0,
+    action:  'iptables -A OUTPUT -m owner --uid-owner %L -j DROP'
+  }
+
+a unique match of the value of the group above (ie \d+) is considered
+an event. So to illustrate further, if the following line was
+observed in /var/log/kern.log with the configured "pattern" above:
+
+  IPTABLES - audit out smtp IN= OUT=eth0 ... UID=12333 ...
+
+the "event" is considered an occurance of "12333". A limit of event
+occurances per time period is configured, along with a threshold.
+If a particular event exceeds this limit, an arbitrary command configured
+against the source is executed, with '%L' substituted for the event. In
+the example above, the following command would be executed:
+
+  iptables -A OUTPUT -m owner --uid-owner 12333 -j DROP
+
+=head1 SIGNALS
+
+The mousetrap daemon will catch the HUP signal, reload the configuration
+that the daemon was started with, and restart all source watcher child
+processes.
+
+=head1 AUTHOR
+
+Mikey Austin, E<lt>mikey@jackiemclean.net<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014  Mikey Austin <mikey@jackiemclean.net>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 =cut
