@@ -32,7 +32,7 @@ sub new {
         . MT::Config->new->{_file});
 
     $self->{_options}->{pidfile} =
-        $options->{pidfile} || MT::Config->get('pidfile');
+        $options->{pidfile} || MT::Config->get('pid_file');
     MT::Config->set('pidfile', $self->{_options}->{pidfile});
 
     # Set remaining options.
@@ -56,7 +56,7 @@ sub start {
     # Start watcher processes.
     MT::Logger->write('Started mousetrap');
 
-    $self->{_select} = IO::Select->new();
+    $self->{_select} = IO::Select->new;
     $self->start_watchers;
 
     # Set the various signal handlers after the sender has been forked.
@@ -66,6 +66,8 @@ sub start {
     for(;;) {
         while(my @ready = $self->{_select}->can_read) {
             foreach my $handle (@ready) {
+                my $label = <$handle>;
+                print "Watcher match: $label\n";
             }
         }
     }
@@ -145,12 +147,10 @@ sub start_watcher {
     $source = MT::Config->get('sources')->{$name};
     pipe($read, $write);
 
-    if(!($pid = fork())) {
+    if(($pid = fork()) == 0) {
         # In child.
         my $watcher = MT::Watcher->new($name, $source, $write);
         close($read);
-
-        # Start the sleep loop for the sender process.
         $watcher->start;
     }
     elsif($pid < 0) {
@@ -158,12 +158,12 @@ sub start_watcher {
     }
     else {
         close($write);
+        $self->{_select}->add($read);
         $self->{_watcher_pids}->{$pid} = $name;
         $self->{_watchers}->{$name} = {
             _pid  => $pid,
             _read => $read
         };
-        $self->{_select}->add($read);
     }
 
     return $read;

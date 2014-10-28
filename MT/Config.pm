@@ -56,7 +56,9 @@ sub new {
     $self->{_config}->{simulation}   ||= 0;
     $self->{_config}->{event_max}    ||= 10;
     $self->{_config}->{event_period} ||= 30;
-    $self->{_config}->{pidfile}      ||= '/tmp/mousetrap.pid';
+    $self->{_config}->{pid_file}     ||= '/tmp/mousetrap.pid';
+    $self->{_config}->{tail_file}    ||= '/usr/bin/tail';
+    $self->{_config}->{tail_args}    ||= '-q --follow=name --retry -n 0';
 
     return ($instance = bless $self, $class);
 }
