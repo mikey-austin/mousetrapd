@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use MT::Server;
+use Getopt::Long;
+use Pod::Usage;
+
+my $options = {
+    daemonize => 0,
+    user      => undef,
+    group     => undef,
+    pidfile   => undef,
+    config    => undef,
+};
+
+my $help = 0;
+my $version = 0;
+
+GetOptions(
+    "daemonize|daemon|daemonise" => \$options->{daemonize},
+    "user=s"                     => \$options->{user},
+    "group=s"                    => \$options->{group},
+    "pidfile=s"                  => \$options->{pidfile},
+    "config=s"                   => \$options->{config},
+    "help"                       => \$help,
+    "version"                    => \$version)
+    or pod2usage(1) and die("Error in command line arguments\n");
+
+if($version) {
+    print MT::Config->name, ' version ', MT::Config->version, "\n\n";
+    pod2usage(1);
+}
+
+if($help) {
+    pod2usage(1);
+}
+
+my $server = MT::Server->new($options);
+$server->start;
+
+__END__
+=head1 mousetrap
+
+mousetrap - Trapping daemon
+
+=head1 SYNOPSIS
+
+  mousetrap [options]
+
+  Options:
+    --daemon               start as a daemon
+    --user=<user>          user to setuid to
+    --group=<group>        group to setgid to
+    --pidfile=<pidfile>    location of the pidfile
+    --config=<config>      path to configuration file
+    --help                 print help and exit
+    --version              print version and exit
+
+=cut
