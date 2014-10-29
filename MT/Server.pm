@@ -253,9 +253,9 @@ sub register_signals {
     };
 
     #
-    # Reload the sender process on HUP.
+    # Reload the watcher processes on HUP.
     #
-    $SIG{'HUP'} = sub {
+    $SIG{'HUP'} = $SIG{'PIPE'} = sub {
         MT::Logger->write('Received HUP, reloading configuration...');
         MT::Config->reload($self->{_options}->{config}, $self->DEFAULTS);
 
@@ -264,10 +264,6 @@ sub register_signals {
 
         # The watchers will restart.
         $self->stop_watchers('HUP');
-    };
-
-    $SIG{'PIPE'} = sub {
-        # Ignore, but maybe catch and restart the watcher?
     };
 
     #

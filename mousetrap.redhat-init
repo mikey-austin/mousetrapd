@@ -35,7 +35,7 @@ stop() {
 }
 
 status() {
-    if [ ! -f "$VAR_SUBSYS_MOUSETRAP" ]; then
+    if [ ! -f "$VAR_SUBSYS_MOUSETRAP" -o ! -f "$PIDFILE" ]; then
         echo $"mousetrap is stopped."
         return 1
     fi
