@@ -14,7 +14,7 @@
 %define version    0.0.1
 %define release    1
 %define mandir     /usr/share/man
-%define sbindir    /usr/local/sbin
+%define sbindir    /usr/sbin
 
 #--------------------------------------------------------------------------------
 #  Basic package information
@@ -65,6 +65,7 @@ mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 mkdir -p %{buildroot}/etc/sysconfig
 mkdir -p %{buildroot}/usr/share/man/man8/
 mkdir -p %{buildroot}/var/run/%{name}/
+mkdir -p %{buildroot}/var/empty/%{name}
 
 make DESTDIR=%{buildroot} mandir=%{_mandir} install
 
@@ -77,7 +78,7 @@ install -m755 mousetrap.redhat-init %{buildroot}%{_initrddir}/%{name}
 /sbin/chkconfig --add %{name}
 # Manually add user/group
 %{sbindir}/groupadd %{name}
-%{sbindir}/useradd -g %{name} -d %{_sysconfdir}/%{name} -s /bin/false %{name}
+%{sbindir}/useradd -g %{name} -d /var/empty/%{name} -s /bin/false %{name}
 
 #--------------------------------------------------------------------------------
 #  Take mousetrap out of runlevels
@@ -107,7 +108,8 @@ fi
 %doc README CREDITS LICENSE
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
 %attr(755,root,root) %config(noreplace) %{_initrddir}/%{name}
-%attr(755,root,root) %{sbindir}/%{name}
+%attr(755,root,root) /usr/local/sbin/%{name}
+%attr(755,%{name},%{name}) /var/run/%{name}
 %{_mandir}/man8/%{name}.8*
 
 #--------------------------------------------------------------------------------

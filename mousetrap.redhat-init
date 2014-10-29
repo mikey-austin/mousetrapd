@@ -11,59 +11,45 @@
 . /etc/init.d/functions
 
 MOUSETRAP=mousetrap
+PIDFILE=/var/run/mousetrap/mousetrap.pid
+CONFIG=/etc/mousetrap/mousetrap.conf
 
 VAR_SUBSYS_MOUSETRAP=/var/lock/subsys/$MOUSETRAP
 
 start() {
-
     echo -n $"Starting mousetrap: "
-    daemon /usr/sbin/mousetrap -c /etc/mousetrap/mousetrap.conf -p /var/run/mousetrap.pid
+    daemon /usr/local/sbin/$MOUSETRAP --daemon -c $CONFIG  -p $PIDFILE
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch $VAR_SUBSYS_MOUSETRAP
     return $RETVAL
-
 }
 
 stop() {
-
     echo -n $"Stopping mousetrap: "
     killproc mousetrap
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && rm -f $VAR_SUBSYS_MOUSETRAP
     return $RETVAL
-
 }
 
 status() {
-
     if [ ! -f "$VAR_SUBSYS_MOUSETRAP" ]; then
         echo $"mousetrap is stopped."
         return 1
     fi
 
-    echo "Running: `cat /var/run/mousetrap.pid`"
+    echo "mousetrap daemon (pid `cat $PIDFILE`) is running..."
 
     return $RETVAL
-
 }
 
 reload() {
-
-    status
+    echo -n $"Reloading mousetrap: "
+    killproc -p $PIDFILE $MOUSETRAP -HUP
     RETVAL=$?
-    if [ $RETVAL -eq 0 ]; then
-        echo -n $"Reloading mousetrap: "
-        kill -HUP `cat /var/run/mousetrap.pid` &>/dev/null
-        RETVAL=$?
-        echo
-        [ $RETVAL -eq 0 ]
-        return $RETVAL
-    else
-        return $RETVAL
-    fi
-
+    echo
 }
 
 restart() {

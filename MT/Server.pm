@@ -55,7 +55,6 @@ sub start {
         exit(1);
     }
 
-
     if($self->{_options}->{daemonize}) {
         $self->daemonize;
     }
@@ -118,19 +117,19 @@ sub daemonize {
     MT::Config->set('logging_facility', 'syslog');
 
     # Drop privileges.
-    if(defined $self->{_options}->{user}) {
-        my $uid = getpwnam($self->{_options}->{user});
-        if(not POSIX::setuid($uid)) {
-            MT::Logger->err("Could not setuid to $uid, exiting...", 'err');
+    if(defined $self->{_options}->{group}) {
+        my $gid = getgrnam($self->{_options}->{group});
+        if(not POSIX::setgid($gid)) {
+            MT::Logger->err("Could not setgid to $gid: $!");
             $self->shutdown;
             exit(1);
         }
     }
 
-    if(defined $self->{_options}->{group}) {
-        my $gid = getgrnam($self->{_options}->{group});
-        if(not POSIX::setgid($gid)) {
-            MT::Logger->err("Could not setgid to $gid, exiting...", 'err');
+    if(defined $self->{_options}->{user}) {
+        my $uid = getpwnam($self->{_options}->{user});
+        if(not POSIX::setuid($uid)) {
+            MT::Logger->err("Could not setuid to $uid: $!");
             $self->shutdown;
             exit(1);
         }
