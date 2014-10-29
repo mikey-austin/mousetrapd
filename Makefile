@@ -16,16 +16,28 @@ perllibdir = /usr/local/share/perl5
 MAN_SECTION = 8
 
 DOCS = LICENSE README CREDITS
-SAMPLES = sample-mousetrap.conf
+SAMPLES = sample-mousetrap.conf mousetrap.redhat-init mousetrap.redhat-spec
 BIN = Makefile mousetrap
 MAN = mousetrap.8
 LIB = MT/
-
+TARBALL = mousetrap-${VERSION}.tar.gz
 DIST_DIR = mousetrap-${VERSION}
 
 FILES = ${DOCS} ${SAMPLES} ${BIN} ${MAN}
 
 all: ${FILES}
+
+clean:
+	rm -rf mousetrap*.tar.gz
+
+dist: ${TARBALL}
+
+${TARBALL}:
+	mkdir -p ${DIST_DIR}
+	cp ${FILES} ${DIST_DIR}
+	cp -r ${LIB} ${DIST_DIR}/${LIB}
+	tar czvf ${TARBALL} ${DIST_DIR}
+	rm -rf ${DIST_DIR}
 
 doc:
 	pod2man --center "Mousetrap" --section ${MAN_SECTION} mousetrap >mousetrap.${MAN_SECTION}

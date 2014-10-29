@@ -14,7 +14,7 @@
 %define version    0.0.1
 %define release    1
 %define mandir     /usr/share/man
-%define sbindir    /usr/sbin
+%define sbindir    /usr/local/sbin
 
 #--------------------------------------------------------------------------------
 #  Basic package information
@@ -69,7 +69,6 @@ mkdir -p %{buildroot}/var/run/%{name}/
 make DESTDIR=%{buildroot} mandir=%{_mandir} install
 
 install -m755 mousetrap.redhat-init %{buildroot}%{_initrddir}/%{name}
-touch %{buildroot}/var/run/%{name}.pid
 
 #--------------------------------------------------------------------------------
 #  Things to run after it has been installed.
@@ -104,6 +103,7 @@ fi
 #--------------------------------------------------------------------------------
 %files
 %defattr(644,root,root,755)
+/usr/local/share/perl5/MT/*
 %doc README CREDITS LICENSE
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
 %attr(755,root,root) %config(noreplace) %{_initrddir}/%{name}
