@@ -8,7 +8,7 @@ use YAML::XS;
 
 use constant {
     NAME     => 'mousetrap',
-    VERSION  => '0.0.1',
+    VERSION  => '0.0.3',
 };
 
 # Singleton instance.

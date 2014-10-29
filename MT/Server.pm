@@ -77,7 +77,7 @@ sub start {
             my $name = $self->{_watcher_handles}->{fileno($handle)};
             if(defined(my $label = <$handle>)) {
                 chomp $label;
-                if(not $self->{_token_bucket}->check($label)) {
+                if(not $self->{_token_bucket}->check($name, $label)) {
                     $self->execute_action($name, $label);
                 }
                 else {
