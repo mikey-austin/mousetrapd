@@ -15,7 +15,7 @@ perllibdir = /usr/local/share/perl5
 
 MAN_SECTION = 8
 
-DOCS = LICENSE README
+DOCS = LICENSE README CREDITS
 SAMPLES = sample-mousetrap.conf
 BIN = Makefile mousetrap
 MAN = mousetrap.8

@@ -1,0 +1,96 @@
+#!/bin/sh
+#
+# mousetrap        Start mousetrap
+#
+# chkconfig: 2345 08 92
+# description:  Starts, stops mousetrap daemon
+#
+# config: /etc/mousetrap/mousetrap.conf
+
+# Source function library.
+. /etc/init.d/functions
+
+MOUSETRAP=mousetrap
+
+VAR_SUBSYS_MOUSETRAP=/var/lock/subsys/$MOUSETRAP
+
+start() {
+
+    echo -n $"Starting mousetrap: "
+    daemon /usr/sbin/mousetrap -c /etc/mousetrap/mousetrap.conf -p /var/run/mousetrap.pid
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $VAR_SUBSYS_MOUSETRAP
+    return $RETVAL
+
+}
+
+stop() {
+
+    echo -n $"Stopping mousetrap: "
+    killproc mousetrap
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $VAR_SUBSYS_MOUSETRAP
+    return $RETVAL
+
+}
+
+status() {
+
+    if [ ! -f "$VAR_SUBSYS_MOUSETRAP" ]; then
+        echo $"mousetrap is stopped."
+        return 1
+    fi
+
+    echo "Running: `cat /var/run/mousetrap.pid`"
+
+    return $RETVAL
+
+}
+
+reload() {
+
+    status
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ]; then
+        echo -n $"Reloading mousetrap: "
+        kill -HUP `cat /var/run/mousetrap.pid` &>/dev/null
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ]
+        return $RETVAL
+    else
+        return $RETVAL
+    fi
+
+}
+
+restart() {
+    stop
+    start
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    reload)
+        reload
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+        ;;
+esac
+
+exit $?
