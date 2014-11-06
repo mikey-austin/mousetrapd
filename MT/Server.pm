@@ -58,8 +58,9 @@ sub start {
     if($self->{_options}->{daemonize}) {
         $self->daemonize;
     }
-
-    $self->save_pid;
+    else {
+        $self->save_pid;
+    }
 
     # Start watcher processes.
     MT::Logger->write('Started mousetrap');
@@ -116,6 +117,11 @@ sub daemonize {
     # Log to syslog.
     MT::Config->set('logging_facility', 'syslog');
 
+    # Open the PID file before dropping privileges.
+    open(PID, '>' . MT::Config->get('pidfile'))
+        or die 'Could not open ' . MT::Config->get('pidfile')
+        . ' for writing';
+
     # Drop privileges.
     if(defined $self->{_options}->{group}) {
         my $gid = getgrnam($self->{_options}->{group});
@@ -152,6 +158,10 @@ sub daemonize {
     elsif($pid) {
         exit;
     }
+
+    # Write the new PID to the previously opened PID file.
+    print PID $$;
+    close PID;
 
     # Change root directory and clear file creation mask.
     chdir('/');

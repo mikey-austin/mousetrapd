@@ -11,7 +11,7 @@
 #  to define things once, and have to change things in only one place.
 #--------------------------------------------------------------------------------
 %define name       mousetrap
-%define version    0.0.4
+%define version    0.0.5
 %define release    1
 %define mandir     /usr/share/man
 %define sbindir    /usr/sbin
@@ -64,7 +64,7 @@ mkdir -p %{buildroot}%{_initrddir}
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 mkdir -p %{buildroot}/etc/sysconfig
 mkdir -p %{buildroot}/usr/share/man/man8/
-mkdir -p %{buildroot}/var/run/%{name}/
+mkdir -p %{buildroot}/var/run/
 mkdir -p %{buildroot}/var/empty/%{name}
 
 make DESTDIR=%{buildroot} mandir=%{_mandir} install
@@ -79,7 +79,6 @@ install -m755 mousetrap.redhat-init %{buildroot}%{_initrddir}/%{name}
 # Manually add user/group
 %{sbindir}/groupadd %{name}
 %{sbindir}/useradd -g %{name} -d /var/empty/%{name} -s /bin/false %{name}
-chown %{name}:%{name} /var/run/%{name}
 
 #--------------------------------------------------------------------------------
 #  Take mousetrap out of runlevels
