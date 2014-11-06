@@ -109,7 +109,6 @@ fi
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
 %attr(755,root,root) %config(noreplace) %{_initrddir}/%{name}
 %attr(755,root,root) /usr/local/sbin/%{name}
-%attr(755,root,root) /var/run/%{name}
 %{_mandir}/man8/%{name}.8*
 
 #--------------------------------------------------------------------------------
