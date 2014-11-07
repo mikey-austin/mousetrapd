@@ -6,12 +6,7 @@ bindir = /usr/local/sbin
 sysconfdir = /etc
 docdir = /usr/share/doc/mousetrap
 mandir = /usr/share/man
-
-# On Debian
-#perllibdir = /usr/local/lib/site_perl
-
-# RHEL
-perllibdir = /usr/local/share/perl5
+perllibdir = /usr/share/perl5
 
 MAN_SECTION = 8
 
@@ -20,8 +15,11 @@ SAMPLES = sample-mousetrap.conf mousetrap.redhat-init mousetrap.redhat-spec
 BIN = Makefile mousetrap
 MAN = mousetrap.8
 LIB = MT/
-TARBALL = mousetrap-${VERSION}.tar.gz
+
 DIST_DIR = mousetrap-${VERSION}
+DEB_DIST_DIR = mousetrap-${VERSION}-debian
+TARBALL = mousetrap_${VERSION}.orig.tar.gz
+DEB_TARBALL = mousetrap_${VERSION}.debian.tar.gz
 
 FILES = ${DOCS} ${SAMPLES} ${BIN} ${MAN}
 
@@ -30,7 +28,7 @@ all: ${FILES}
 clean:
 	rm -rf mousetrap*.tar.gz
 
-dist: ${TARBALL}
+dist: ${TARBALL} ${DEB_TARBALL}
 
 ${TARBALL}:
 	mkdir -p ${DIST_DIR}
@@ -38,6 +36,13 @@ ${TARBALL}:
 	cp -r ${LIB} ${DIST_DIR}/${LIB}
 	tar czvf ${TARBALL} ${DIST_DIR}
 	rm -rf ${DIST_DIR}
+
+${DEB_TARBALL}:
+	mkdir -p ${DEB_DIST_DIR}
+	cp debian/* ${DEB_DIST_DIR}
+	cp mousetrap.debian-init ${DEB_DIST_DIR}/init
+	tar czvf ${DEB_TARBALL} ${DEB_DIST_DIR}
+	rm -rf ${DEB_DIST_DIR}
 
 doc:
 	pod2man --center "Mousetrap" --section ${MAN_SECTION} mousetrap >mousetrap.${MAN_SECTION}

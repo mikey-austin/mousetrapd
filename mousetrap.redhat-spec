@@ -26,7 +26,7 @@ Release:           %{release}
 Group:             System Environment/Daemons
 License:           ISC-style
 Url:               https://github.com/mikey-austin/mousetrap
-Source0:           %{name}-%{version}.tar.gz
+Source0:           %{name}_%{version}.orig.tar.gz
 Requires:          perl perl-YAML-LibYAML
 Buildroot:         %{_tmppath}/%{name}-buildroot
 

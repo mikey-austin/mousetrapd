@@ -1,0 +1,31 @@
+#! /bin/sh
+# preinst script for mousetrap
+
+set -e
+
+case "$1" in
+    install)
+    ;;
+
+    upgrade)
+        if [ -x "/etc/init.d/mousetrap" ]; then
+            if [ -x "`which invoke-rc.d 2>/dev/null`" ]; then
+                    invoke-rc.d mousetrap stop || exit $?
+            else
+                    /etc/init.d/mousetrap stop || exit $?
+            fi
+         fi
+    ;;
+
+    abort-upgrade)
+    ;;
+
+*)
+    echo "preinst called with unknown argument '$1'" >&2
+    exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

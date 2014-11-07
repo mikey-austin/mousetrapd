@@ -1,0 +1,25 @@
+#! /bin/sh
+# postrm script for mousetrap
+
+set -e
+
+case "$1" in
+       purge)
+         if getent passwd mousetrap 2>&1 >/dev/null; then
+             echo -n "Removing mousetrap system user.."
+             userdel mousetrap
+             echo ".done"
+         fi
+
+         ;;
+       remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+         ;;
+    *)
+        echo "postrm called with unknown argument \`$1'" >&2
+        exit 1
+
+esac
+
+#DEBHELPER#
+
+exit 0
