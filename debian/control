@@ -1,4 +1,4 @@
-Source: mousetrap
+Source: mousetrapd
 Section: admin
 Priority: optional
 Maintainer: Mikey Austin <mikey@jackiemclean.net>
@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 7.0.8)
 Standards-Version: 3.9.2
 Homepage: http://jackiemclean.net
 
-Package: mousetrap
+Package: mousetrapd
 Architecture: all
 Depends: ${perl:Depends}, ${misc:Depends}, adduser, libyaml-libyaml-perl
 Description: Log monitoring and active response daemon
