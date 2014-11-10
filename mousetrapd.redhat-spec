@@ -104,7 +104,7 @@ fi
 #--------------------------------------------------------------------------------
 %files
 %defattr(644,root,root,755)
-/usr/local/share/perl5/MT/*
+/usr/share/perl5/MT/*
 %doc README CREDITS LICENSE
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
 %attr(755,root,root) %config(noreplace) %{_initrddir}/%{name}
