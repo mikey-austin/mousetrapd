@@ -1,6 +1,6 @@
 # Mousetrap makefile for distribution
 
-VERSION = 0.0.5
+VERSION = 0.1.0
 
 bindir = /usr/local/sbin
 sysconfdir = /etc
