@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ### BEGIN INIT INFO
-# Provides:        mousetrap
+# Provides:        mousetrapd
 # Required-Start:  $network $remote_fs $syslog
 # Required-Stop:   $network $remote_fs $syslog
 # Default-Start:   2 3 4 5
@@ -13,30 +13,30 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin
 
 . /lib/lsb/init-functions
 
-NAME=mousetrap
+NAME=mousetrapd
 DAEMON=/usr/local/sbin/$NAME
 PIDFILE=/var/run/$NAME.pid
-CONFIG=/etc/mousetrap/mousetrap.conf
+CONFIG=/etc/mousetrapd/mousetrapd.conf
 
 if [ -f /etc/default/$NAME ]; then
     . /etc/default/$NAME
 fi
 
 if test "$(uname -s)" = "Linux"; then
-    MOUSETRAP_OPTS="$MOUSETRAP_OPTS --daemon --config $CONFIG --pidfile $PIDFILE"
+    MOUSETRAPD_OPTS="$MOUSETRAPD_OPTS --daemon --config $CONFIG --pidfile $PIDFILE"
 fi
 
 test -f $DAEMON || exit 0
 
 case $1 in
     start)
-        log_daemon_msg "Starting Mousetrap daemon" "mousetrap"
-        start-stop-daemon --start --pidfile $PIDFILE --startas $DAEMON -- $MOUSETRAP_OPTS
+        log_daemon_msg "Starting Mousetrap daemon" "mousetrapd"
+        start-stop-daemon --start --pidfile $PIDFILE --startas $DAEMON -- $MOUSETRAPD_OPTS
         status=$?
         log_end_msg $status
         ;;
     stop)
-        log_daemon_msg "Stopping mousetrap" "mousetrap"
+        log_daemon_msg "Stopping mousetrapd" "mousetrapd"
         start-stop-daemon --stop --pidfile $PIDFILE
         log_end_msg $?
         rm -f $PIDFILE
@@ -45,12 +45,12 @@ case $1 in
         $0 stop && sleep 2 && $0 start
         ;;
     reload)
-        log_daemon_msg "Reloading mousetrap configuration" "mousetrap"
+        log_daemon_msg "Reloading mousetrapd configuration" "mousetrapd"
         kill -HUP `cat $PIDFILE` &>/dev/null
         log_end_msg $?
         ;;
     status)
-        status_of_proc $DAEMON "Mousetrap"
+        status_of_proc $DAEMON "Mousetrapd"
         exit $?
         ;;
     *)

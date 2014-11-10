@@ -1,15 +1,15 @@
 #! /bin/sh
-# postinst script for mousetrap
+# postinst script for mousetrapd
 
 set -e
 
 case "$1" in
     configure)
-      if ! getent passwd mousetrap 2>&1 >/dev/null; then
+      if ! getent passwd mousetrapd 2>&1 >/dev/null; then
          # the account doesn't exist... time to create it
-         echo "Adding mousetrap system user ..."
-         adduser --quiet --system --group --home /dev/null mousetrap
-         adduser --quiet mousetrap adm
+         echo "Adding mousetrapd system user ..."
+         adduser --quiet --system --group --home /dev/null mousetrapd
+         adduser --quiet mousetrapd adm
       fi
     ;;
 

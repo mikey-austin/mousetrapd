@@ -1,8 +1,8 @@
-mousetrap
-    mousetrap - Log monitoring and active response daemon
+mousetrapd
+    mousetrapd - Log monitoring and active response daemon
 
 SYNOPSIS
-      mousetrap [options]
+      mousetrapd [options]
 
       Options:
         --daemon               start as a daemon
@@ -19,7 +19,7 @@ DESCRIPTION
     of observer "events".
 
     An event is a captured string extracted out of a line from a log file.
-    For example, if the following source was configured in the mousetrap
+    For example, if the following source was configured in the mousetrapd
     configuration file:
 
       my_iptables_source: {
@@ -44,9 +44,9 @@ DESCRIPTION
       iptables -A OUTPUT -m owner --uid-owner 12333 -j DROP
 
 SIGNALS
-    The mousetrap daemon will catch the HUP signal, reload the configuration
-    that the daemon was started with, and restart all source watcher child
-    processes.
+    The mousetrapd daemon will catch the HUP signal, reload the
+    configuration that the daemon was started with, and restart all source
+    watcher child processes.
 
 AUTHOR
     Mikey Austin, <mikey@jackiemclean.net>

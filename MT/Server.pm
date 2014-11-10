@@ -14,8 +14,8 @@ use POSIX ();
 
 use constant {
     DEFAULTS => [
-        '/etc/mousetrap/mousetrap.conf',
-        '/etc/mousetrap/mousetrap.yaml',
+        '/etc/mousetrapd/mousetrapd.conf',
+        '/etc/mousetrapd/mousetrapd.yaml',
         ]
 };
 
@@ -63,7 +63,7 @@ sub start {
     }
 
     # Start watcher processes.
-    MT::Logger->write('Started mousetrap');
+    MT::Logger->write('Started mousetrapd');
 
     $self->{_select} = IO::Select->new;
     $self->start_watchers;
@@ -310,7 +310,7 @@ sub register_signals {
 sub shutdown {
     my $self = shift;
 
-    MT::Logger->write("Shutting down mousetrap $$...");
+    MT::Logger->write("Shutting down mousetrapd $$...");
     $self->stop_watchers;
 
     unlink(MT::Config->get('pidfile')) if -e MT::Config->get('pidfile');

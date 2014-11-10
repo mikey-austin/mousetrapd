@@ -7,8 +7,8 @@ use warnings;
 use YAML::XS;
 
 use constant {
-    NAME     => 'mousetrap',
-    VERSION  => '0.1.0',
+    NAME     => 'mousetrapd',
+    VERSION  => '0.1.1',
 };
 
 # Singleton instance.
@@ -57,7 +57,7 @@ sub new {
     $self->{_config}->{event_max}    ||= 10;
     $self->{_config}->{event_period} ||= 30;
     $self->{_config}->{threshold}    ||= 10;
-    $self->{_config}->{pid_file}     ||= '/var/run/mousetrap.pid';
+    $self->{_config}->{pid_file}     ||= '/var/run/mousetrapd.pid';
     $self->{_config}->{tail_file}    ||= '/usr/bin/tail';
     $self->{_config}->{tail_args}    ||= '-q --follow=name --retry -n 0';
 

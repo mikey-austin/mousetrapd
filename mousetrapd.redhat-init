@@ -1,0 +1,82 @@
+#!/bin/sh
+#
+# mousetrapd        Start mousetrapd
+#
+# chkconfig: 2345 08 92
+# description:  Starts, stops mousetrapd daemon
+#
+# config: /etc/mousetrapd/mousetrapd.conf
+
+# Source function library.
+. /etc/init.d/functions
+
+MOUSETRAPD=mousetrapd
+PIDFILE=/var/run/mousetrapd.pid
+CONFIG=/etc/mousetrapd/mousetrapd.conf
+
+VAR_SUBSYS_MOUSETRAPD=/var/lock/subsys/$MOUSETRAPD
+
+start() {
+    echo -n $"Starting mousetrapd: "
+    daemon /usr/local/sbin/$MOUSETRAPD --daemon -c $CONFIG  -p $PIDFILE
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $VAR_SUBSYS_MOUSETRAPD
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping mousetrapd: "
+    killproc mousetrapd
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $VAR_SUBSYS_MOUSETRAPD
+    return $RETVAL
+}
+
+status() {
+    if [ ! -f "$VAR_SUBSYS_MOUSETRAPD" -o ! -f "$PIDFILE" ]; then
+        echo $"mousetrapd is stopped."
+        return 1
+    fi
+
+    echo "mousetrapd daemon (pid `cat $PIDFILE`) is running..."
+
+    return $RETVAL
+}
+
+reload() {
+    echo -n $"Reloading mousetrapd: "
+    killproc -p $PIDFILE $MOUSETRAPD -HUP
+    RETVAL=$?
+    echo
+}
+
+restart() {
+    stop
+    start
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    reload)
+        reload
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+        ;;
+esac
+
+exit $?

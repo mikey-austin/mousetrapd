@@ -1,3 +1,9 @@
+mousetrapd (0.1.1-1) UNRELEASED; urgency=low
+
+  * Initial release, and changed entire program name. (Closes: #XXXXXX)
+
+ -- Mikey Austin <mikey@jackiemclean.net>  Mon, 10 Nov 2014 13:36:24 +1100
+
 mousetrapd (0.1.0-1) UNRELEASED; urgency=low
 
   * Initial release, and changed package name. (Closes: #XXXXXX)

@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------
-#  Program:  mousetrap.spec
+#  Program:  mousetrapd.spec
 #
 #  Purpose:  This is the data file user to generate RPM files so that we can
 #            distrbute 'canned' versions of what we have done more easily.
@@ -10,8 +10,8 @@
 #  Some basic definitions for use to use later in the file.  We really only want
 #  to define things once, and have to change things in only one place.
 #--------------------------------------------------------------------------------
-%define name       mousetrap
-%define version    0.1.0
+%define name       mousetrapd
+%define version    0.1.1
 %define release    1
 %define mandir     /usr/share/man
 %define sbindir    /usr/sbin
@@ -19,13 +19,13 @@
 #--------------------------------------------------------------------------------
 #  Basic package information
 #--------------------------------------------------------------------------------
-Summary:           mousetrap log monitoring and active response daemon
+Summary:           mousetrapd log monitoring and active response daemon
 Name:              %{name}
 Version:           %{version}
 Release:           %{release}
 Group:             System Environment/Daemons
 License:           ISC-style
-Url:               https://github.com/mikey-austin/mousetrap
+Url:               https://github.com/mikey-austin/mousetrapd
 Source0:           %{name}_%{version}.orig.tar.gz
 Requires:          perl perl-YAML-LibYAML
 Buildroot:         %{_tmppath}/%{name}-buildroot
@@ -53,7 +53,7 @@ frequency of observer "events".
 #  Configuration process for the package
 #--------------------------------------------------------------------------------
 
-### No configure process for mousetrap
+### No configure process for mousetrapd
 
 #--------------------------------------------------------------------------------
 #  The install process for the package
@@ -69,7 +69,7 @@ mkdir -p %{buildroot}/var/empty/%{name}
 
 make DESTDIR=%{buildroot} mandir=%{_mandir} install
 
-install -m755 mousetrap.redhat-init %{buildroot}%{_initrddir}/%{name}
+install -m755 mousetrapd.redhat-init %{buildroot}%{_initrddir}/%{name}
 
 #--------------------------------------------------------------------------------
 #  Things to run after it has been installed.
@@ -81,7 +81,7 @@ install -m755 mousetrap.redhat-init %{buildroot}%{_initrddir}/%{name}
 %{sbindir}/useradd -g %{name} -d /var/empty/%{name} -s /bin/false %{name}
 
 #--------------------------------------------------------------------------------
-#  Take mousetrap out of runlevels
+#  Take mousetrapd out of runlevels
 #--------------------------------------------------------------------------------
 %preun
 if [ "$1" = 0 ]; then
@@ -89,8 +89,8 @@ if [ "$1" = 0 ]; then
 fi
 
 #--------------------------------------------------------------------------------
-#  Remove mousetrap user/group if necessary (since "mousetrap" is the only
-#  member of group "mousetrap", then deletion of "mousetrap" user deletes
+#  Remove mousetrapd user/group if necessary (since "mousetrapd" is the only
+#  member of group "mousetrapd", then deletion of "mousetrapd" user deletes
 #  the group.
 #--------------------------------------------------------------------------------
 %postun

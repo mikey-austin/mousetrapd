@@ -1,13 +1,13 @@
 #! /bin/sh
-# postrm script for mousetrap
+# postrm script for mousetrapd
 
 set -e
 
 case "$1" in
        purge)
-         if getent passwd mousetrap 2>&1 >/dev/null; then
-             echo -n "Removing mousetrap system user.."
-             userdel mousetrap
+         if getent passwd mousetrapd 2>&1 >/dev/null; then
+             echo -n "Removing mousetrapd system user.."
+             userdel mousetrapd
              echo ".done"
          fi
 

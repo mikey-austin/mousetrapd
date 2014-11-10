@@ -40,13 +40,13 @@ my $server = MT::Server->new($options);
 $server->start;
 
 __END__
-=head1 mousetrap
+=head1 mousetrapd
 
-mousetrap - Log monitoring and active response daemon
+mousetrapd - Log monitoring and active response daemon
 
 =head1 SYNOPSIS
 
-  mousetrap [options]
+  mousetrapd [options]
 
   Options:
     --daemon               start as a daemon
@@ -64,7 +64,7 @@ configuration file and executes arbitrary actions based on the
 frequency of observer "events".
 
 An event is a captured string extracted out of a line from a log file.
-For example, if the following source was configured in the mousetrap
+For example, if the following source was configured in the mousetrapd
 configuration file:
 
   my_iptables_source: {
@@ -90,7 +90,7 @@ the example above, the following command would be executed:
 
 =head1 SIGNALS
 
-The mousetrap daemon will catch the HUP signal, reload the configuration
+The mousetrapd daemon will catch the HUP signal, reload the configuration
 that the daemon was started with, and restart all source watcher child
 processes.
 

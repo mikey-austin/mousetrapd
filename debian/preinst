@@ -1,5 +1,5 @@
 #! /bin/sh
-# preinst script for mousetrap
+# preinst script for mousetrapd
 
 set -e
 
@@ -8,11 +8,11 @@ case "$1" in
     ;;
 
     upgrade)
-        if [ -x "/etc/init.d/mousetrap" ]; then
+        if [ -x "/etc/init.d/mousetrapd" ]; then
             if [ -x "`which invoke-rc.d 2>/dev/null`" ]; then
-                    invoke-rc.d mousetrap stop || exit $?
+                    invoke-rc.d mousetrapd stop || exit $?
             else
-                    /etc/init.d/mousetrap stop || exit $?
+                    /etc/init.d/mousetrapd stop || exit $?
             fi
          fi
     ;;
