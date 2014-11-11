@@ -43,19 +43,38 @@ sub start {
 
     $self->start_tail;
 
-    my $pattern = $self->{_source}->{pattern};
-    my $index   = $self->{_source}->{index};
-    if(not defined $index or $index !~ /^\d+$/) {
-        $index = 0;
-        MT::Logger->warn('Index not set for watcher '
-                         . $self->{_name} . ' '
-                         . 'setting to 0');
+    my @patterns;
+
+    # Add default pattern/index combo if they exist.
+    my $pat = $self->{_source}->{pattern};
+    my $ind   = $self->{_source}->{index} || 0;
+    push @patterns, { pattern => $pat, index => $ind }
+        if(defined $pat and defined $ind);
+
+    if(defined $self->{_source}->{patterns}
+       and ref $self->{_source}->{patterns} eq 'ARRAY')
+    {
+        foreach my $subpat (@{$self->{_source}->{patterns}}) {
+            if(defined $subpat->{pattern}) {
+                $subpat->{index} ||= 0;
+                push @patterns, $subpat;
+            }
+        }
+    }
+
+    if(@patterns == 0) {
+        MT::Logger->err("No configured patterns for " . $self->{_name});
+        $self->shutdown(1);
     }
 
     while(my $buf = readline($self->{_read})) {
-        if((@matches = ($buf =~ /$pattern/)) and $matches[$index]) {
-            print { $self->{_parent_handle} } $matches[$index] . "\n";
-            $self->{_parent_handle}->flush;
+        foreach $pat (@patterns) {
+            my ($pattern, $index) = ($pat->{pattern}, $pat->{index});
+            if((@matches = ($buf =~ /$pattern/)) and $matches[$index]) {
+                print { $self->{_parent_handle} } $matches[$index] . "\n";
+                $self->{_parent_handle}->flush;
+                last;
+            }
         }
     }
 

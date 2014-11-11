@@ -11,7 +11,7 @@
 #  to define things once, and have to change things in only one place.
 #--------------------------------------------------------------------------------
 %define name       mousetrapd
-%define version    0.1.1
+%define version    0.2.0
 %define release    1
 %define mandir     /usr/share/man
 %define sbindir    /usr/sbin
